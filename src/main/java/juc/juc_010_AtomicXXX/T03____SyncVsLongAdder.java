@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class T03____SyncVsLongAdder {
     static long count2 = 0L;
-    static AtomicLong count1 = new AtomicLong();
     static LongAdder count3 = new LongAdder();
 
     public static void main(String[] args) {
@@ -34,6 +33,32 @@ public class T03____SyncVsLongAdder {
         }
         long end =System.currentTimeMillis();
 
-        System.out.println("time+"+(end-start)+"------"+count3);
+        System.out.println("LongAdder+"+(end-start)+"------"+count3);
+        Object o =new Object();
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(()->{
+                for (int j = 0; j < 10000; j++) {
+                    synchronized (o){
+                        count2++;
+                    }
+                }
+            });
+        }
+
+        start =System.currentTimeMillis();
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+         end =System.currentTimeMillis();
+
+        System.out.println("syn+"+(end-start)+"------"+count2);
+
     }
 }

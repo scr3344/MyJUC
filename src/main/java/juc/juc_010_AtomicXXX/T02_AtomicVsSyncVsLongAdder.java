@@ -16,7 +16,7 @@ public class T02_AtomicVsSyncVsLongAdder {
         Thread[] threads = new Thread[1000];
         for (int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(()->{
-                for (int j = 0; j < 10000; j++) {
+                for (int j = 0; j < 100000; j++) {
                     count1.incrementAndGet();
                 }
             });
@@ -35,5 +35,61 @@ public class T02_AtomicVsSyncVsLongAdder {
         long end =System.currentTimeMillis();
 
         System.out.println("time+"+(end-start)+"------"+count1);
+
+        // -----------------
+        Object lock = new Object();
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < 1000000; j++) {
+                        synchronized (lock){
+                            count2++;
+                        }
+                    }
+                }
+            });
+        }
+        start =System.currentTimeMillis();
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        end =System.currentTimeMillis();
+        System.out.println("sync+"+(end-start)+"------"+count2);
+
+        //-----------------
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] =new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < 1000000; j++) {
+                        count3.increment();
+                    }
+                }
+            });
+
+        }
+        start =System.currentTimeMillis();
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        end =System.currentTimeMillis();
+        System.out.println("LongAdder+"+(end-start)+"------"+count3);
+
+
     }
 }
