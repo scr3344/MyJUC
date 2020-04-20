@@ -2,13 +2,15 @@ package juc.juc_011;
 
 import java.util.concurrent.CountDownLatch;
 
-/**
+/**倒数的门栓，latch.await()等待，当countDown结束直到减为0，打开门栓，继续往下执行
+ * 这样就可以控制线程什么时候往下执行了
+ * join只能等线程结束，才能往下执行，countDown比他灵活
  * @author scr
  * @create 2020-04-16 23:46
  */
 public class T06_TestCountDownLatch {
     public static void main(String[] args) {
-       // usingJoin();
+        usingJoin();
         usingCountDoenLatch();
     }
     private static void usingCountDoenLatch(){
